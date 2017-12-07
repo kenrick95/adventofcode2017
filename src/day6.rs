@@ -21,38 +21,37 @@ fn get_next(vec: &Vec<u32>) -> Vec<u32> {
 
   some_vec[idx_to_distribute as usize] = 0;
 
-  let mut left = value_to_distribute;
+  let size = vec.len() as u32;
+
   let mut i = idx_to_distribute as usize + 1;
-  // TODO: Optimize this, this is too naive
+  let inc = value_to_distribute / size;
+
+  let inc_bigger = inc + 1;
+  let mut bigger_num = value_to_distribute % size;
+
   loop {
-    if i >= vec.len() {
+    if i >= size as usize {
       i = 0;
     }
-    if left == 0 {
+    if bigger_num > 0 {
+      bigger_num -= 1;
+      some_vec[i] += inc_bigger;
+    } else {
+      some_vec[i] += inc;
+    }
+    if i == idx_to_distribute as usize {
       break;
     }
-    some_vec[i] += 1;
-    left -= 1;
+    
     i += 1;
   }
 
-  for x in &some_vec {
-    print!("{} ", x);
-  }
-  println!("...");
+  // for x in &some_vec {
+  //   print!("{} ", x);
+  // }
+  // println!("...");
 
   return some_vec;
-}
-
-fn get_count(vec: Vec<u32>, hash_map: &mut HashMap<Vec<u32>, u32>) -> u32 {
-  if hash_map.contains_key(&vec) {
-    return 0;
-  }
-
-  let new_vec = get_next(&vec);
-  hash_map.insert(vec, 1);
-
-  return 1 + get_count(new_vec.clone(), hash_map);
 }
 
 pub fn main() {
@@ -64,7 +63,13 @@ pub fn main() {
   }
   let mut hash_map = HashMap::new();
 
-  let count = get_count(vec.clone(), &mut hash_map);
+  let mut count = 0;
+  while !hash_map.contains_key(&vec) {
+    count += 1;
+    hash_map.insert(vec.clone(), 1);
+    vec = get_next(&vec);
+  }
+
 
   println!("{}", count);
 }
