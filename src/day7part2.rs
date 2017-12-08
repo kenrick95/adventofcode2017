@@ -7,6 +7,26 @@ struct Entry {
   children_names: Vec<String>,
 }
 
+fn get_value(node: String, hash_map: &HashMap<String, Entry>) -> u32 {
+  let entry = hash_map.get(&node).unwrap();
+  let mut children_values: Vec<u32> = Vec::new();
+  for child in &entry.children_names {
+    children_values.push(get_value(child.clone(), hash_map));
+  }
+  let mut children_sum = 0;
+  print!("at node {}: ", node);
+  for val in children_values {
+    children_sum += val;
+    print!("{}, ", val);
+  }
+  println!("....");
+
+  // The first time we encounter an odd children, then set something?
+  // TODO
+
+  return entry.value + children_sum;
+}
+
 pub fn main() {
   let mut hash_map: HashMap<String, Entry> = HashMap::new();
   let mut parent_map: HashMap<String, String> = HashMap::new();
@@ -37,7 +57,7 @@ pub fn main() {
       root = name.clone();
     }
 
-    print!("name {}, value {}, ", name, value);
+    // print!("name {}, value {}, ", name, value);
 
     if splits.len() > 1 {
       // Parse RHS, children names
@@ -47,12 +67,12 @@ pub fn main() {
       }
     }
 
-    print!("children names: ");
+    // print!("children names: ");
     for child_name in &children_names {
-      print!("{}, ", child_name);
+      // print!("{}, ", child_name);
       parent_map.insert(child_name.clone(), name.clone());
     }
-    println!("..");
+    // println!("..");
 
     let entry = Entry {
       value: value,
@@ -66,9 +86,9 @@ pub fn main() {
   while parent_map.contains_key(&root) {
     root = parent_map.get(&root).unwrap().clone();
   }
+  println!("root {}", root);
 
   // get values of each children, traversing from root
+  get_value(root.clone(), &hash_map);
   // then at the deepest level with odd subtree, answer = its siblings' value
-
-  println!("{}", root);
 }
