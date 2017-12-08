@@ -15,14 +15,23 @@ fn get_value(node: String, hash_map: &HashMap<String, Entry>) -> u32 {
   }
   let mut children_sum = 0;
   print!("at node {}: ", node);
-  for val in children_values {
-    children_sum += val;
-    print!("{}, ", val);
+  for val in &children_values {
+    children_sum += *val;
+    print!("{}, ", *val);
   }
   println!("....");
 
   // The first time we encounter an odd children, then set something?
-  // TODO
+
+  if children_values.len() > 1 {
+    children_values.sort();
+    if children_values[0] != children_values[children_values.len() - 1] {
+      // something is odd
+      println!("Something is odd!");
+      // TODO: Go to the "odd" child, get it's value, get it's children values, do some math
+      // ... (oh well, it's pretty difficult, so I manually check it and got AC, lol)
+    }
+  }
 
   return entry.value + children_sum;
 }
