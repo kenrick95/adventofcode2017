@@ -1,7 +1,7 @@
 use std::io;
 
 pub fn main() {
-  let mut score = 0;
+  let mut garbage_count = 0;
 
   // TODO: Read input from file
   loop {
@@ -10,6 +10,7 @@ pub fn main() {
     if input.trim() == "" {
       break;
     }
+
 
     let mut char_pointer = input.trim().chars();
     let mut current_level = 0;
@@ -37,6 +38,7 @@ pub fn main() {
         continue;
       }
       if is_garbage {
+        garbage_count += 1;
         continue;
       }
       if character == '<' {
@@ -48,7 +50,6 @@ pub fn main() {
         continue;
       }
       if character == '}' {
-        score += current_level;
         current_level -= 1;
         continue;
       }
@@ -56,5 +57,5 @@ pub fn main() {
 
   }
 
-  println!("{}", score);
+  println!("{}", garbage_count);
 }
