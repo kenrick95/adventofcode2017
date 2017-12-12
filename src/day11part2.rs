@@ -32,13 +32,8 @@ fn reduce(hash_map: &mut HashMap<&str, i32>) -> i32 {
   //   println!("{} {}", k, v);
   // }
 
-  // ne + s --> se
-  // se + n --> ne
-  // nw + s --> sw
-  // sw + n --> nw
-  // ne + nw --> n
-  // sw + se --> s
 
+  // ne + s --> se
   {
     let ne_count = *hash_map.get("ne").unwrap();
     let s_count = *hash_map.get("s").unwrap();
@@ -54,13 +49,14 @@ fn reduce(hash_map: &mut HashMap<&str, i32>) -> i32 {
   //   println!("{} {}", k, v);
   // }
 
+  // nw + s --> sw
   {
     let nw_count = *hash_map.get("nw").unwrap();
-    let n_count = *hash_map.get("n").unwrap();
+    let s_count = *hash_map.get("s").unwrap();
     let sw_count = *hash_map.get("sw").unwrap();
-    let common_count = cmp::min(nw_count, n_count);
+    let common_count = cmp::min(nw_count, s_count);
     hash_map.insert("nw", nw_count - common_count);
-    hash_map.insert("n", n_count - common_count);
+    hash_map.insert("s", s_count - common_count);
     hash_map.insert("sw", sw_count + common_count);
   }
   // println!("3");
@@ -69,13 +65,14 @@ fn reduce(hash_map: &mut HashMap<&str, i32>) -> i32 {
   //   println!("{} {}", k, v);
   // }
 
+  // se + n --> ne
   {
     let se_count = *hash_map.get("se").unwrap();
-    let s_count = *hash_map.get("s").unwrap();
+    let n_count = *hash_map.get("n").unwrap();
     let ne_count = *hash_map.get("ne").unwrap();
-    let common_count = cmp::min(se_count, s_count);
+    let common_count = cmp::min(se_count, n_count);
     hash_map.insert("se", se_count - common_count);
-    hash_map.insert("s", s_count - common_count);
+    hash_map.insert("n", n_count - common_count);
     hash_map.insert("ne", ne_count + common_count);
   }
   // println!("4");
@@ -85,6 +82,7 @@ fn reduce(hash_map: &mut HashMap<&str, i32>) -> i32 {
   // }
 
 
+  // sw + n --> nw
   {
     let sw_count = *hash_map.get("sw").unwrap();
     let n_count = *hash_map.get("n").unwrap();
@@ -100,6 +98,7 @@ fn reduce(hash_map: &mut HashMap<&str, i32>) -> i32 {
   //   println!("{} {}", k, v);
   // }
 
+  // sw + se --> s
   {
     let se_count = *hash_map.get("se").unwrap();
     let sw_count = *hash_map.get("sw").unwrap();
@@ -115,6 +114,7 @@ fn reduce(hash_map: &mut HashMap<&str, i32>) -> i32 {
   //   println!("{} {}", k, v);
   // }
 
+  // ne + nw --> n
   {
     let ne_count = *hash_map.get("ne").unwrap();
     let nw_count = *hash_map.get("nw").unwrap();
@@ -125,14 +125,14 @@ fn reduce(hash_map: &mut HashMap<&str, i32>) -> i32 {
     hash_map.insert("n", n_count + common_count);
   }
 
-  println!("7");
+  // println!("7");
 
   let mut total_value = 0;
   for (k, v) in hash_map.iter() {
-    println!("{} {}", k, v);
+    // println!("{} {}", k, v);
     total_value += v;
   }
-  println!("{}", total_value);
+  // println!("{}", total_value);
   return total_value;
 }
 
