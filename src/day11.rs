@@ -1,6 +1,139 @@
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
+use std::cmp;
+
+fn reduce(hash_map: &mut HashMap<&str, i32>) -> i32 {
+  // s + n --> 0
+  // se + nw --> 0
+  // sw + ne --> 0
+
+  {
+    let n_count = *hash_map.get("n").unwrap();
+    let s_count = *hash_map.get("s").unwrap();
+    hash_map.insert("n", cmp::max(n_count - s_count, 0));
+    hash_map.insert("s", cmp::max(s_count - n_count, 0));
+  }
+  {
+    let ne_count = *hash_map.get("ne").unwrap();
+    let sw_count = *hash_map.get("sw").unwrap();
+    hash_map.insert("ne", cmp::max(ne_count - sw_count, 0));
+    hash_map.insert("sw", cmp::max(sw_count - ne_count, 0));
+  }
+  {
+    let nw_count = *hash_map.get("nw").unwrap();
+    let se_count = *hash_map.get("se").unwrap();
+    hash_map.insert("nw", cmp::max(nw_count - se_count, 0));
+    hash_map.insert("se", cmp::max(se_count - nw_count, 0));
+  }
+  println!("1");
+
+  for (k, v) in hash_map.iter() {
+    println!("{} {}", k, v);
+  }
+
+  // ne + s --> se
+  // se + n --> ne
+  // nw + s --> sw
+  // sw + n --> nw
+  // ne + nw --> n
+  // sw + se --> s
+
+  {
+    let ne_count = *hash_map.get("ne").unwrap();
+    let s_count = *hash_map.get("s").unwrap();
+    let se_count = *hash_map.get("se").unwrap();
+    let common_count = cmp::min(ne_count, s_count);
+    hash_map.insert("ne", ne_count - common_count);
+    hash_map.insert("s", s_count - common_count);
+    hash_map.insert("se", se_count + common_count);
+  }
+  println!("2");
+
+  for (k, v) in hash_map.iter() {
+    println!("{} {}", k, v);
+  }
+
+  {
+    let nw_count = *hash_map.get("nw").unwrap();
+    let n_count = *hash_map.get("n").unwrap();
+    let sw_count = *hash_map.get("sw").unwrap();
+    let common_count = cmp::min(nw_count, n_count);
+    hash_map.insert("nw", nw_count - common_count);
+    hash_map.insert("n", n_count - common_count);
+    hash_map.insert("sw", sw_count + common_count);
+  }
+  println!("3");
+
+  for (k, v) in hash_map.iter() {
+    println!("{} {}", k, v);
+  }
+
+  {
+    let se_count = *hash_map.get("se").unwrap();
+    let s_count = *hash_map.get("s").unwrap();
+    let ne_count = *hash_map.get("ne").unwrap();
+    let common_count = cmp::min(se_count, s_count);
+    hash_map.insert("se", se_count - common_count);
+    hash_map.insert("s", s_count - common_count);
+    hash_map.insert("ne", ne_count + common_count);
+  }
+  println!("4");
+
+  for (k, v) in hash_map.iter() {
+    println!("{} {}", k, v);
+  }
+
+
+  {
+    let sw_count = *hash_map.get("sw").unwrap();
+    let n_count = *hash_map.get("n").unwrap();
+    let nw_count = *hash_map.get("nw").unwrap();
+    let common_count = cmp::min(sw_count, n_count);
+    hash_map.insert("sw", sw_count - common_count);
+    hash_map.insert("n", n_count - common_count);
+    hash_map.insert("nw", nw_count + common_count);
+  }
+  println!("5");
+
+  for (k, v) in hash_map.iter() {
+    println!("{} {}", k, v);
+  }
+
+  {
+    let se_count = *hash_map.get("se").unwrap();
+    let sw_count = *hash_map.get("sw").unwrap();
+    let s_count = *hash_map.get("s").unwrap();
+    let common_count = cmp::min(se_count, sw_count);
+    hash_map.insert("se", se_count - common_count);
+    hash_map.insert("sw", sw_count - common_count);
+    hash_map.insert("s", s_count + common_count);
+  }
+  println!("6");
+
+  for (k, v) in hash_map.iter() {
+    println!("{} {}", k, v);
+  }
+
+  {
+    let ne_count = *hash_map.get("ne").unwrap();
+    let nw_count = *hash_map.get("nw").unwrap();
+    let n_count = *hash_map.get("n").unwrap();
+    let common_count = cmp::min(ne_count, nw_count);
+    hash_map.insert("ne", ne_count - common_count);
+    hash_map.insert("nw", nw_count - common_count);
+    hash_map.insert("n", n_count + common_count);
+  }
+
+  println!("7");
+
+  let mut total_value = 0;
+  for (k, v) in hash_map.iter() {
+    println!("{} {}", k, v);
+    total_value += v;
+  }
+  return total_value;
+}
 
 pub fn main() {
   let mut input = String::new();
@@ -19,66 +152,6 @@ pub fn main() {
     println!("{} {}", k, v);
   }
 
-  // ne + s --> se
-  // se + n --> ne
-  // nw + s --> sw
-  // sw + n --> nw
-  // ne + nw --> n
-  // sw + se --> s
-
-  // s + n --> 0
-  // se + nw --> 0
-  // sw + ne --> 0
-
-  
-  let n_count = *hash_map.get("n").unwrap();
-  let s_count = *hash_map.get("s").unwrap();
-  if n_count > s_count {
-    hash_map.insert("n", n_count - s_count);
-    hash_map.insert("s", 0);
-  } else {
-    hash_map.insert("n", 0);
-    hash_map.insert("s", s_count - n_count);
-  }
-
-  let ne_count = *hash_map.get("ne").unwrap();
-  let sw_count = *hash_map.get("sw").unwrap();
-  if ne_count > sw_count {
-    hash_map.insert("ne", ne_count - sw_count);
-    hash_map.insert("sw", 0);
-  } else {
-    hash_map.insert("ne", 0);
-    hash_map.insert("sw", sw_count - ne_count);
-  }
-
-  let nw_count = *hash_map.get("nw").unwrap();
-  let se_count = *hash_map.get("se").unwrap();
-  if nw_count > se_count {
-    hash_map.insert("nw", nw_count - se_count);
-    hash_map.insert("se", 0);
-  } else {
-    hash_map.insert("nw", 0);
-    hash_map.insert("se", se_count - nw_count);
-  }
-
-  println!("");
-
-  for (k, v) in hash_map.iter() {
-    println!("{} {}", k, v);
-  }
-
-  // s 43
-  // ne 256
-  // se 440
-  // nw 0
-  // n 0
-  // sw 0
-  // Manual analysis:
-  // ne + s --> se
-  // so
-  // ne: 256 - 43
-  // s: 0
-  // se: 440 + 43
-  // total: 696
-
+  let answer = reduce(&mut hash_map);
+  println!("{}", answer);
 }
