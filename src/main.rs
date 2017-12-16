@@ -1,6 +1,6 @@
 // extern crate regex;
-mod day14part2;
+mod day15;
 
 fn main() {
-    day14part2::main();
+    day15::main();
 }
