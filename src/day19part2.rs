@@ -36,7 +36,7 @@ pub fn main() {
 
   let mut dx = 0;
   let mut dy = 1;
-  let mut counter = 0;
+  let mut counter = 1; // for initial "step" from outside to first cell
 
   loop {
     let val = map[row][col];
@@ -83,7 +83,7 @@ pub fn main() {
       }
     }
 
-
+    counter += 1;
 
     row = next_row as usize;
     col = next_col as usize;
@@ -93,4 +93,6 @@ pub fn main() {
     print!("{}", letter);
   }
   println!("");
+
+  println!("counter {}", counter);
 }
