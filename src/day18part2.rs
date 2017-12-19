@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
+use std::collections::VecDeque;
 
 fn get_from_register(register: &String, registers: &mut HashMap<String, i64>) -> i64 {
   return match registers.get(register) {
@@ -47,14 +48,14 @@ fn op_mod(a: String, b: String, registers: &mut HashMap<String, i64>) {
 }
 
 
-fn op_snd(a: String, registers: &mut HashMap<String, i64>, history: &mut Vec<i64>) {
+fn op_snd(a: String, registers: &mut HashMap<String, i64>, history: &mut VecDeque<i64>) {
   let a_num = get_from_register(&a, registers);
-  history.push(a_num);
+  history.push_back(a_num);
 }
 
-fn op_rcv(a: String, registers: &mut HashMap<String, i64>, history: &mut Vec<i64>) -> bool {
+fn op_rcv(a: String, registers: &mut HashMap<String, i64>, history: &mut VecDeque<i64>) -> bool {
   if history.len() > 0 {
-    registers.insert(a, history.pop().unwrap());
+    registers.insert(a, history.pop_front().unwrap());
     return true;
   }
   return false;
@@ -64,7 +65,7 @@ fn op_rcv(a: String, registers: &mut HashMap<String, i64>, history: &mut Vec<i64
 pub fn main() {
   let mut input = String::new();
   let mut registers = vec![HashMap::new(), HashMap::new()];
-  let mut message_queue = vec![Vec::new(), Vec::new()];
+  let mut message_queue = vec![VecDeque::new(), VecDeque::new()];
 
   // PID 0
   // all registers are 0 (including "p" = 0; "p" means PID)
@@ -89,9 +90,7 @@ pub fn main() {
 
   let mut current_index = vec![0, 0];
   loop {
-    if thread_loop_counter % 100 == 0 {
-      println!("thread loop {}, pid {}", thread_loop_counter, current_pid);
-    }
+    // println!("thread loop {}, pid {}", thread_loop_counter, current_pid);
     let mut next_pid = 0;
     if current_pid == 0 {
       next_pid = 1;
@@ -104,11 +103,6 @@ pub fn main() {
     let ref mut current_pid_index = current_index[current_pid];
     let ref mut current_pid_register = registers[current_pid];
     let ref mut current_pid_snd_counter = snd_counter[current_pid];
-    if *current_pid_index < 0 || *current_pid_index >= instruction_len as i64 {
-      deadlock_counter_inst += 1;
-      continue;
-    }
-    deadlock_counter_inst = 0;
 
     while *current_pid_index >= 0 && *current_pid_index < instruction_len as i64 {
       let instruction = instructions[*current_pid_index as usize];
@@ -152,6 +146,7 @@ pub fn main() {
         if !success {
           // break and let other "thread" run
           deadlock_counter += 1;
+          // println!(">>> {}, {} {}, cur {}, next {}", current_pid, current_pid_index, instruction, message_queue[current_pid].len(), message_queue[next_pid].len());
           break;
         }
       } else if operator == "jgz" {
@@ -168,11 +163,19 @@ pub fn main() {
       }
       deadlock_counter = 0;
     }
+    
+    if *current_pid_index < 0 || *current_pid_index >= instruction_len as i64 {
+      deadlock_counter_inst += 1;
+    } else {
+      deadlock_counter_inst = 0;
+    }
+    
+
     // println!("-----");
     // for (key, value) in current_pid_register {
     //   println!("reg {}, value {}", key, value);
     // }
-    // println!("deadlock_counter {}", deadlock_counter);
+    // println!("deadlock_counter {} {}", deadlock_counter, deadlock_counter_inst);
     // println!("-----");
     // println!("");
 
@@ -180,7 +183,8 @@ pub fn main() {
     thread_loop_counter += 1;
   }
 
-  println!("answer {}", snd_counter[1]);
+  // println!("answer 0 -> {}", snd_counter[0]);
+  println!("answer 1 -> {}", snd_counter[1]);
 
   // for (key, value) in registers {
   //   println!("reg {}, value {}", key, value);
