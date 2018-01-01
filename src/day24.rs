@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
 
@@ -7,20 +6,30 @@ struct Bridge {
   port_end: u32
 }
 
-fn traverse(current_port: u32, used_index: &mut Vec<u32>) -> u32 {
+fn traverse(current_port: u32, used_index: &mut Vec<usize>, bridges: &Vec<Bridge>) -> u32 {
   let mut max_value = 0;
-  for (index, bridge); in bridges.iter().enumerate() {
-    if bridge.port_start == current_port {
-      used_index.push(index);
-      let temp = traverse(bridge.port_end, used_index);
-      used_index.pop();
+  // println!("{:?}, {:?}", current_port, used_index);
+  for (index, bridge) in bridges.iter().enumerate() {
+    if !used_index.contains(&index) {
+      let temp;
+      if bridge.port_start == current_port {
+        used_index.push(index);
+        temp = traverse(bridge.port_end, used_index, bridges) + bridge.port_start;
+        used_index.pop();
+      } else if bridge.port_end == current_port {
+        used_index.push(index);
+        temp = traverse(bridge.port_start, used_index, bridges) + bridge.port_end;
+        used_index.pop();
+      } else {
+        temp = 0;
+      }
 
       if temp > max_value {
         max_value = temp;
       }
     }
   }
-  return max_value;
+  return max_value + current_port;
 }
 
 pub fn main() {
@@ -31,7 +40,8 @@ pub fn main() {
   f.read_to_string(&mut input).unwrap();
 
   for bridge_str in input.lines() {
-    let splits = String::from(bridge_str).trim().split("/").collect();
+    let bridge_string = String::from(bridge_str).clone();
+    let splits: Vec<&str> = bridge_string.trim().split("/").collect();
     let lhs: u32 = String::from(splits[0]).parse().unwrap();
     let rhs: u32 = String::from(splits[1]).parse().unwrap();
 
@@ -49,7 +59,7 @@ pub fn main() {
     }
   }
   let mut used_index = vec![];
-  let answer = traverse(0, &mut used_index);
+  let answer = traverse(0, &mut used_index, &bridges);
   println!("{}", answer);
 
 }
